@@ -64,3 +64,37 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 - 최종 Codex 판정(CLEAN / max-rounds 도달 시 미해결 목록).
 - 문서 변경 요약.
 - **커밋은 하지 않는다**(사용자 몫). 비용 참고: 리뷰·문서 추론은 Codex(OpenAI) 쿼터 소모, 클로드 토큰은 최소.
+
+## 레드플래그 (이러면 이 스킬을 어긴 것)
+- ❌ **Codex 리뷰를 건너뛰고 클로드가 직접 리뷰**해 "리뷰 끝"이라 함 → 이 스킬의 핵심은 **독립 모델 검증**이다. 자기 리뷰는 확증편향이고 토큰 절감 목적도 무너진다.
+- ❌ **Codex 지적을 검토 없이 전부 반영** → 확정 버그/보안만 수술적으로, 이견·스타일은 보고에만.
+- ❌ **리뷰 단계에 `-s workspace-write` 사용** → 리뷰는 항상 `-s read-only`. write는 문서 단계에서만.
+- ❌ **codex 미설치/미로그인(에러)인데 "리뷰했다"고 진행** → 즉시 중단하고 설치·로그인 안내.
+- ❌ **`--max-rounds` 무시하고 clean 날 때까지 무한정 반복** → 한도에서 멈추고 미해결을 보고.
+- ❌ **스스로 `git commit` / `push`** → 커밋은 사용자 몫.
+
+## 예시 흐름 (참고)
+```
+사용자: /codex-review:codex-loop        (현재 diff에 결제 취소 로직 변경이 있음)
+
+[라운드 1]
+  클로드→bash: git diff | codex exec -s read-only "critical code review: ...변경분 한정..."
+  Codex 출력:
+    [High] refundAmount가 null일 때 NPE 가능 (PaymentService.java:88)
+    [Low]  변수명 amt 축약 지양 권장
+    VERDICT: ISSUES
+  클로드: High(NPE)만 수술적 수정(널 가드 추가). Low(변수명)은 취향→미반영, 보고에 기록.
+
+[라운드 2]
+  클로드→bash: git diff | codex exec -s read-only "..."
+  Codex 출력: 확정 이슈 없음 / VERDICT: CLEAN  → 루프 종료
+
+[문서]
+  클로드: 갱신 필요 문서 특정 = CHANGELOG.md
+  클로드→bash: codex exec -s workspace-write "...CHANGELOG.md만 갱신..."
+  git diff 확인 → CHANGELOG.md만 변경됨 ✔ (코드 변경 없음)
+
+[보고]
+  라운드 2회 / 수정: PaymentService.java 널 가드 1건 /
+  미반영(이견): 변수명 amt(Low, 취향) / 문서: CHANGELOG.md 1줄 / 커밋 안 함.
+```

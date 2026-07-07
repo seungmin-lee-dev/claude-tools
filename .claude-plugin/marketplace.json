@@ -9,7 +9,7 @@
       "name": "codex-review",
       "source": "./codex-review",
       "description": "Codex CLI 기반 리뷰·문서 오프로드 워크플로 (codex-loop, setup-codex-review)",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "author": {
         "name": "seungmin-lee-dev"
       }
