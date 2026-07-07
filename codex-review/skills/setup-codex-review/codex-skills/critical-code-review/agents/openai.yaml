@@ -1,0 +1,4 @@
+interface:
+  display_name: "Critical Code Review"
+  short_description: "Compact Korean senior code review"
+  default_prompt: "Use $critical-code-review to give a compact Korean senior/QA/CTO code review."

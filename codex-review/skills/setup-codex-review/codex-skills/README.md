@@ -3,6 +3,9 @@
 여기에 팀에 배포할 **Codex 스킬 폴더**를 넣으면, 팀원이 `/setup-codex-review` 실행 시
 각자의 `~/.codex/skills/`로 자동 복사된다.
 
+**현재 번들됨:**
+- `critical-code-review/` — codex-loop 리뷰 단계가 사용하는 CTO/QA 패널 리뷰 스킬 (사내 자체 제작)
+
 예:
 ```
 codex-skills/
