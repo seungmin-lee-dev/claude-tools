@@ -47,4 +47,4 @@ if (Test-Path "$src\*") { Copy-Item "$src\*" $dest -Recurse -Force; "copied Code
 
 ## 4. 완료 보고
 - Codex CLI 설치/로그인 상태, 복사된 Codex 스킬 목록, 남은 수동 작업(설치·로그인)을 요약한다.
-- 마무리: "이제 아무 레포에서나 `/codex-loop`을 사용할 수 있습니다."
+- 마무리: "이제 아무 레포에서나 `/codex-review:codex-loop`을 사용할 수 있습니다."

@@ -1,17 +1,17 @@
 {
-  "name": "mindon-tools",
-  "description": "MindOn 내부 Claude Code 도구 마켓플레이스",
+  "name": "claude-tools",
+  "description": "팀 내부 Claude Code 도구 모음 (플러그인 마켓플레이스)",
   "owner": {
-    "name": "MindOn"
+    "name": "seungmin-lee-dev"
   },
   "plugins": [
     {
       "name": "codex-review",
-      "description": "Codex CLI 기반 리뷰·문서 오프로드 워크플로 (/codex-loop, /setup-codex-review)",
+      "source": "./codex-review",
+      "description": "Codex CLI 기반 리뷰·문서 오프로드 워크플로 (codex-loop, setup-codex-review)",
       "version": "0.1.0",
-      "source": "./",
       "author": {
-        "name": "MindOn"
+        "name": "seungmin-lee-dev"
       }
     }
   ]
