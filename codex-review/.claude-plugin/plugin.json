@@ -1,7 +1,7 @@
 {
   "name": "codex-review",
   "description": "Codex CLI 기반 리뷰·문서 오프로드 워크플로. 코드는 클로드가, 리뷰·문서는 Codex가. /codex-loop 반복 개선 루프 + /setup-codex-review 로 Codex 쪽 셋업.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "MindOn"
   },

@@ -31,24 +31,32 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 
 1. **Codex 리뷰 (read-only)** — 클로드가 Bash로 실행:
    ```bash
-   git diff | codex exec -s read-only "critical code review: 아래 <stdin>의 diff를 critical-code-review 관점(QA+CTO, 회의적 시니어 패널)으로 리뷰하라. 확정 버그를 우선, findings-first로 한국어로. 마지막 줄에 반드시 'VERDICT: CLEAN' 또는 'VERDICT: ISSUES' 한 줄을 출력하라."
+   git diff | codex exec -s read-only "critical code review: 아래 <stdin>의 diff에 나타난 **변경분에 한정**해 critical-code-review 관점(QA+CTO, 회의적 시니어 패널)으로 리뷰하라. 변경과 무관한 기존 코드는 지적하지 마라. 확정 버그를 우선, findings-first로 한국어로, 각 finding에 심각도(Critical/High/Medium/Low)를 붙여라. 마지막 줄에 반드시 'VERDICT: CLEAN'(실질 이슈 없음) 또는 'VERDICT: ISSUES' 한 줄만 출력하라."
    ```
    - diff가 매우 크면(대략 6만 토큰 초과) 파일 단위로 나눠 호출하거나 범위 축소를 제안.
 2. **판정 읽기** — Codex 출력의 마지막 `VERDICT:` 줄과 findings를 읽는다.
+   - VERDICT 줄이 없거나 형식이 어긋나면(외부 출력이라 가능) **문자열에 의존하지 말고 findings 내용으로 직접 판단**한다: 수정이 필요한 실질 이슈가 하나도 없으면 CLEAN으로 간주.
 3. **분기**:
-   - `VERDICT: CLEAN` → 루프 종료(5단계로).
-   - `VERDICT: ISSUES` → 클로드가 findings 중 실질 이슈를 **코드로 직접 수정**한다. 수정 후 다음 라운드로.
-4. **라운드 카운트** — `--max-rounds` 도달 시, 남은 미해결 findings를 보고에 남기고 루프 종료.
+   - CLEAN(또는 실질 이슈 없음) → 루프 종료(5단계로).
+   - ISSUES → 클로드가 **수술적으로** 수정한다. 지침:
+     - **확정 버그·정확성/보안 이슈만** 반영. 스타일·취향·"이러면 더 좋음" 류는 반영하지 말고 보고에만 남긴다.
+     - **동의하지 않는 지적(오판/false positive)은 고치지 말고** 이유와 함께 보고에 남긴다(무지성 반영 금지).
+     - 지적된 부분만 **최소 범위**로 수정. 무관한 코드·포맷은 건드리지 않는다.
+     - 수정 후 다음 라운드로.
+4. **수렴 / 한도**:
+   - `--max-rounds` 도달 시, 남은 미해결 findings를 보고에 남기고 종료.
+   - 같은 지적이 두 라운드 연속 반복되는데 클로드가 이견으로 반영하지 않기로 했다면, 더 돌리지 말고 그 항목을 "이견(unresolved)"으로 표시하고 종료(무한 왕복 방지).
 
 각 `codex exec`는 비대화형이라 승인 프롬프트로 멈추지 않는다. 리뷰 단계는 항상 `-s read-only`(Codex가 코드를 못 건드림).
 
 ## 5. 문서 갱신 (`--no-docs`면 생략)
-클로드가 Bash로 실행 — Codex가 문서를 직접 편집(workspace-write):
-```bash
-codex exec -s workspace-write "이번 변경(git diff 참고)에 맞춰 관련 문서를 갱신하라: README/CHANGELOG/설정 문서/공개 API 주석 등 실제로 영향받는 것만. 코드 로직은 바꾸지 말고 문서·주석만 수정하라. 한국어."
-```
-- `--design-review`면 프롬프트에 "critical-design-review 관점(구조·인터페이스·문서 일관성)"을 추가.
-- 실행 후 클로드가 `git diff`로 문서 변경을 확인한다(코드 파일이 바뀌었으면 사용자에게 알림).
+1. **대상 특정** — 클로드가 이번 변경(git diff)에 비추어 **갱신이 필요한 문서 파일을 먼저 특정**한다(예: `README.md`, `CHANGELOG.md`, 특정 설정 문서, 공개 API 주석). 갱신할 문서가 없으면 이 단계를 건너뛴다.
+2. **Codex 실행** — 특정한 파일만 범위로 지정해 실행(모호한 "관련 문서"가 아니라 명시적 파일 목록):
+   ```bash
+   codex exec -s workspace-write "이번 변경(git diff 참고)에 맞춰 아래 문서 파일만 갱신하라: <특정한 파일 목록>. 그 외 파일과 코드 로직은 절대 건드리지 마라. 문서·주석만 한국어로 수정."
+   ```
+   - `--design-review`면 프롬프트에 "critical-design-review 관점(구조·인터페이스·문서 일관성)"을 추가.
+3. **검증** — 실행 후 클로드가 `git diff`로 변경을 확인한다. **지정한 문서 외 파일(특히 코드)이 바뀌었으면** 사용자에게 알리고, 원치 않으면 그 변경을 되돌린다.
 
 ## 6. 보고
 다음을 요약한다:
