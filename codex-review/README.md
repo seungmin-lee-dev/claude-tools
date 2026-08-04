@@ -6,7 +6,7 @@
 
 ## 포함 스킬 (설치 후 네임스페이스로 호출)
 - **`/codex-review:codex-loop`** — 현재 diff(또는 지시한 기능 구현분)를 Codex `critical-code-review`로
-  리뷰 → 클로드가 수정 → 재리뷰를 clean 또는 최대 N회까지 반복 → Codex가 문서 갱신. 커밋은 안 함.
+  정확성·테스트·운영 위험·코드 구조·모듈화까지 리뷰 → 클로드가 수정 → 재리뷰를 clean 또는 최대 N회까지 반복 → Codex가 문서 갱신. 커밋은 안 함.
   - 인자 없음: 현재 uncommitted diff / `<작업 지시>`: 클로드가 먼저 구현
   - 플래그: `--max-rounds N`(기본 3), `--no-docs`, `--design-review`
 - **`/codex-review:setup-codex-review`** — Codex 쪽 의존성 셋업(1회): Codex CLI 설치/로그인 확인 안내 +

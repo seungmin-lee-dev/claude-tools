@@ -4,7 +4,7 @@
 각자의 `~/.codex/skills/`로 자동 복사된다.
 
 **현재 번들됨:**
-- `critical-code-review/` — codex-loop 리뷰 단계가 사용하는 CTO/QA 패널 리뷰 스킬 (사내 자체 제작)
+- `critical-code-review/` — 정확성·테스트·운영 위험과 근거 기반 코드 분리·모듈화를 함께 검증하는 CTO/QA 패널 리뷰 스킬 (사내 자체 제작)
 
 예:
 ```
