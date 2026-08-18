@@ -1,5 +1,9 @@
 # codex-review (Claude Code 플러그인)
 
+> **동결(frozen).** Codex 구독 종료로 현재 이 플러그인은 유지보수하지 않는다.
+> `critical-code-review` 정책 정본은 [`critical-review/agents/critical-code-reviewer.md`](../critical-review/agents/critical-code-reviewer.md) 로 옮겨졌고,
+> 여기 번들된 Codex용 사본은 동기화되지 않는다. Codex 구독을 재개하면 정본에서 이쪽으로 반영할 것.
+
 코드는 **클로드**가 짜고, 리뷰·문서는 **Codex CLI**에 오프로드하는 리뷰 워크플로.
 무거운 리뷰·문서 추론이 Codex(OpenAI) 쪽에서 돌아 **클로드 토큰을 절감**한다.
 플러그인으로 설치하면 **모든 레포/경로에서** 사용 가능.

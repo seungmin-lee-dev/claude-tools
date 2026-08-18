@@ -23,6 +23,12 @@ Codex CLI 기반 리뷰·문서 오프로드 워크플로. 코드는 클로드, 
 - 스킬: `/codex-review:codex-loop`, `/codex-review:setup-codex-review`
 - 자세한 내용: [`codex-review/README.md`](codex-review/README.md)
 
+### critical-review
+Claude 단독 비판적 코드 리뷰. 외부 CLI 불필요 — 설치하면 바로 사용 가능.
+- 설치: `/plugin install critical-review@claude-tools`
+- 스킬: `/critical-review:critical-code-review`
+- 자세한 내용: [`critical-review/README.md`](critical-review/README.md)
+
 ## 새 도구(플러그인) 추가하는 법
 1. `<플러그인명>/.claude-plugin/plugin.json` + `<플러그인명>/skills/...` 로 하위 폴더 추가
 2. 루트 `.claude-plugin/marketplace.json`의 `plugins[]`에 `{ "name": ..., "source": "./<플러그인명>", ... }` 등록
@@ -31,9 +37,14 @@ Codex CLI 기반 리뷰·문서 오프로드 워크플로. 코드는 클로드, 
 ## 구조
 ```
 .claude-plugin/marketplace.json   # 이 레포 = 마켓플레이스
-codex-review/                     # 플러그인 (하위 폴더)
+codex-review/                     # 플러그인 (Codex 기반, 현재 동결)
   .claude-plugin/plugin.json
   skills/
     codex-loop/SKILL.md
     setup-codex-review/SKILL.md
+critical-review/                  # 플러그인 (Claude 단독)
+  .claude-plugin/plugin.json
+  agents/critical-code-reviewer.md
+  skills/
+    critical-code-review/SKILL.md
 ```
