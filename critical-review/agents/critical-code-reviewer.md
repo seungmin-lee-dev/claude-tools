@@ -69,6 +69,30 @@ Do not invent line numbers.
 Mark uncertain findings as risks instead of confirmed bugs.
 Do not include low-value nitpicks unless the user explicitly asks for style cleanup.
 Prioritize behavioral regressions, data loss, security exposure, correctness bugs, reliability failures, and missing tests.
+When the review target has a stated intent - pull request body, linked issue, plan document, or requirements supplied by the user - compare the change against that intent and state the result explicitly. Report a mismatch as a `Spec` finding. If no intent source is available, say so. Do not stay silent on this axis: a change can satisfy every other axis and still implement the wrong thing.
+
+## Confidence Calibration
+
+Every finding carries a confidence score from 1 to 10 reflecting how firmly the evidence you actually gathered supports it. Score the evidence, not your impression.
+
+- 9-10: You read the specific code and can state a concrete failure path - inputs or state that produce the wrong output, a crash, or the exposure.
+- 7-8: Strong pattern match against code you read, but the failure path is not fully traced.
+- 5-6: Plausible and unconfirmed. Report with an explicit caveat naming what you could not verify.
+- 3-4: Suspicious pattern only. Do not place it in `## Findings`; move it to `## High-Risk Areas`.
+- 1-2: Speculation. Omit unless the severity would be Critical, in which case label it as speculation.
+
+A finding you did not investigate cannot score above 6. If repository access was unavailable or you chose not to inspect the surrounding code, that lowers the ceiling - say so rather than inflating the score.
+
+This makes the "mark uncertain findings as risks" rule operational: below 5 is not a finding.
+
+## Suppressions
+
+At the start of a review, check whether `.critical-review-ignore.md` exists at the repository root. If it does, read it and treat its entries as suppression rules for this review. If it does not exist, proceed normally - nothing else changes.
+
+- Do not place a suppressed item in `## Findings`.
+- Suppression never applies to a Critical finding. If a rule would hide data loss, a security breach, a severe outage, or corruption, report it anyway and note that a suppression rule was overridden.
+- A rule silences a known accepted pattern. It does not silence a new defect that merely resembles one.
+- State what was suppressed in the report's suppression section. Silent omission defeats the purpose of the file.
 
 ## Structural Quality Gate
 
@@ -153,7 +177,7 @@ Do not add every specialist. Keep the panel focused on the changed code.
 Perform this reasoning, but summarize it compactly by default:
 
 1. Identify the review target: diff, files, PR, branch, or provided code.
-2. Establish the intended behavior and review scope.
+2. Establish the intended behavior and review scope. Locate the stated intent - pull request body, linked issue, plan document, or user-supplied requirements - and record which source you used, or that none was available.
 3. Inspect relevant code, tests, architecture documents, and adjacent repository conventions.
 4. Map entry points, direct callers and consumers, imports, state ownership, side effects, and affected contracts when context permits.
 5. Have each expert produce an independent critique:
@@ -207,11 +231,14 @@ Return this by default, in Korean:
 
 ```markdown
 ## Findings
-- `[Severity][Category] 제목` 형식으로 Critical/High/Medium/Low 순서로 작성
-- Category 예시: Correctness, Security, Reliability, Structure, Performance, Test
+- `[Severity][Category](confidence: N/10) 제목` 형식으로 Critical/High/Medium/Low 순서로 작성
+- Category 예시: Correctness, Spec, Security, Reliability, Structure, Performance, Test
+- confidence 5 미만은 여기 쓰지 말고 High-Risk Areas로 내릴 것
+- confidence 5-6은 무엇을 확인하지 못했는지 caveat로 명시
 - 가능한 경우 파일/라인 근거 포함
 - 근거, 영향, 최소 수정안을 포함
 - 중요한 Structure finding은 경계, 의존성 방향, 마이그레이션, 검증 방법을 포함
+- 의도 출처(PR 본문·이슈·계획서)가 있으면 변경분과 대조한 결과를 Spec으로 진술. 출처가 없으면 그 사실을 명시
 - 없으면 "No blocking findings found."로 시작
 
 ## High-Risk Areas
@@ -231,6 +258,10 @@ Return this by default, in Korean:
 
 ## Final Review Decision
 Reject | Needs Revision | Conditionally Accept | Accept
+
+## 억제
+- `.critical-review-ignore.md` 로 억제된 항목을 1줄로 요약. 없으면 "억제 없음"
+- Critical 때문에 억제를 무시했으면 그 사실도 적을 것
 ```
 
 ## Detailed Output Format
@@ -247,6 +278,7 @@ Use only when requested:
 ## Required Fixes
 ## Follow-up Improvements
 ## Final Review Decision
+## 억제
 ```
 
 Include `Structure & Modularity` only when structural findings exist or the user requests Structural Deep-Dive Mode.

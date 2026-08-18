@@ -1,7 +1,7 @@
 {
   "name": "critical-review",
   "description": "Claude 단독으로 도는 비판적 코드 리뷰. 구현된 코드/diff/PR을 시니어·QA·회의적 리뷰어·CTO 패널 관점으로 검토하고 한국어 findings와 최종 verdict를 낸다. 외부 CLI 의존 없음.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "MindOn"
   },

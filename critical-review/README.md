@@ -36,13 +36,42 @@
 
 ```
 ## Findings                (Critical/High/Medium/Low 순, 파일·라인 근거 포함)
+                          각 finding에 confidence 1~10 표기
 ## High-Risk Areas
 ## Missing Tests
 ## 전문가 토론 요약
 ## Required Fixes
 ## Follow-up Improvements
 ## Final Review Decision   (Reject | Needs Revision | Conditionally Accept | Accept)
+## 억제                    (무엇이 억제되었는지 1줄)
 ```
+
+## 신뢰도 점수
+
+모든 finding에 `(confidence: N/10)` 이 붙는다. 코드를 실제로 읽고 실패 경로를
+제시했으면 9~10, 조사하지 않았으면 6을 넘을 수 없다.
+
+**5 미만은 `## Findings` 에 오르지 않고 `## High-Risk Areas` 로 내려간다.**
+오탐이 확정 결함처럼 보이는 것을 막기 위한 장치다.
+
+## Spec 축
+
+리뷰 대상에 명시된 의도(PR 본문·연결된 이슈·계획 문서·직접 준 요구사항)가 있으면
+변경분과 대조해 `Spec` 카테고리로 진술한다. 의도 출처가 없으면 없다고 밝힌다.
+
+다른 축을 전부 통과하면서도 실패할 수 있는 유일한 축이다 — 컨벤션을 다 지키면서
+엉뚱한 것을 구현한 코드가 여기서 걸린다.
+
+## 억제 목록
+
+레포 루트에 `.critical-review-ignore.md` 가 있으면 그 내용을 억제 규칙으로 읽는다.
+파일이 없으면 아무 동작 변화가 없다.
+
+- 형식 자유. 끄고 싶은 지적을 서술하면 된다
+- **Critical 급에는 억제가 적용되지 않는다.** 데이터 손실·보안 침해·심각한 장애를
+  가리는 규칙은 무시하고 보고한다
+- 알려진 허용 패턴만 침묵시킨다. 그것을 닮은 새 결함은 침묵시키지 않는다
+- 무엇이 억제되었는지 리포트 `## 억제` 에 남는다 — 조용한 누락은 없다
 
 ## 비용
 
