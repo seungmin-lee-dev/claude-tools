@@ -106,10 +106,21 @@
 
 ```bash
 cd /c/Users/dsnlab-lsm/Desktop/MindOn/claude-tools
-node -e "const m=require('./.claude-plugin/marketplace.json'), p=require('./critical-review/.claude-plugin/plugin.json'); if(m.plugins.length!==2) throw new Error('plugins 개수 '+m.plugins.length); const e=m.plugins.find(x=>x.name==='critical-review'); if(!e) throw new Error('critical-review 항목 없음'); if(e.version!==p.version) throw new Error('버전 불일치 '+e.version+' vs '+p.version); console.log('OK', p.name, p.version);"
+python -c "
+import json
+m=json.load(open('.claude-plugin/marketplace.json',encoding='utf-8'))
+p=json.load(open('critical-review/.claude-plugin/plugin.json',encoding='utf-8'))
+e=[x for x in m['plugins'] if x['name']=='critical-review'][0]
+assert len(m['plugins'])==2, m['plugins']
+assert e['version']==p['version'], (e['version'], p['version'])
+print('OK', p['name'], p['version'])
+"
 ```
 
 Expected: `OK critical-review 0.1.0`
+
+`node` 는 이 환경(Git Bash)에서 복잡한 따옴표와 함께 쓰면 cmd.exe 오류가 난다. python 을 쓴다.
+파이썬 출력에 한글이 섞이면 앞에 `PYTHONIOENCODING=utf-8` 을 붙인다.
 
 버전 불일치나 JSON 문법 오류면 여기서 실패한다. 실패 시 Step 1~2를 고치고 재실행.
 
