@@ -13,6 +13,15 @@
       "author": {
         "name": "seungmin-lee-dev"
       }
+    },
+    {
+      "name": "critical-review",
+      "source": "./critical-review",
+      "description": "Claude 단독 비판적 코드 리뷰 (critical-code-review). 외부 CLI 불필요",
+      "version": "0.1.0",
+      "author": {
+        "name": "seungmin-lee-dev"
+      }
     }
   ]
 }
