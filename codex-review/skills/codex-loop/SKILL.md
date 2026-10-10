@@ -14,7 +14,7 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 ## 0. 인자 파싱
 - 인자 없음 → **현재 uncommitted diff**를 대상으로 시작.
 - `<작업 지시>`(예: "이메일 중복검사 추가") → 클로드가 **먼저 구현**한 뒤 루프.
-- 플래그: `--max-rounds N`(기본 없음 = clean 까지 반복, 필요할 때만 상한을 건다), `--no-docs`(문서 단계 생략), `--design-review`(critical-design-review 관점 추가).
+- 플래그: `--max-rounds N`(기본 없음 = clean 까지 반복, 필요할 때만 상한을 건다), `--no-docs`(문서 단계 생략), `--design-review`(critical-design-review 관점 추가), `--model M`(기본 `gpt-6.1-sol`), `--effort E`(기본 `medium`).
 
 ## 1. 전제 확인
 - git 레포인지 확인. Codex CLI 존재 확인: `which codex` (없으면 사용자에게 알림).
@@ -26,13 +26,20 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 ## 3. 대상 diff 확보
 `git diff`(uncommitted)를 대상 diff로 둔다. 비어 있으면 "리뷰할 변경이 없음"을 알리고 종료.
 
+## 모델 고정 (모든 `codex exec` 호출에 적용)
+이 스킬의 `codex exec`는 **항상 `-m gpt-6.1-sol -c model_reasoning_effort="medium"`를 붙여** 부른다.
+붙이지 않으면 Codex는 각자 `~/.codex/config.toml`의 기본 모델을 쓴다. 기본값이 최상위 모델·높은 추론 강도인 머신에서는
+리뷰 한 번이 수십만 토큰을 쓰고, 계정을 CI 와 같이 쓰면 주간 한도가 먼저 바닥난다.
+- `--model M` / `--effort E`를 받았을 때만 그 값으로 바꾼다(예: 정말 어려운 변경에 한해 `--model gpt-6-astra`).
+- 사용자가 요청하지 않았는데 클로드가 스스로 더 무거운 모델·강도로 올리지 않는다.
+
 ## 4. 리뷰 루프 (clean 이 날 때까지)
 횟수 제한 없이 아래를 반복한다. `--max-rounds N`을 준 경우에만 N회에서 멈춘다.
 매 라운드 시작 때 사용자에게 한 줄로 진행 상황을 알린다(예: "라운드 4 — 지난 라운드 High 1건 수정, 재리뷰 중").
 
 1. **Codex 리뷰 (read-only)** — 클로드가 Bash로 실행:
    ```bash
-   git diff | codex exec -s read-only "critical code review: 아래 <stdin>의 diff에 나타난 **변경분에 한정**해 critical-code-review 관점(QA+CTO, 회의적 시니어 패널)으로 리뷰하라. 변경과 무관한 기존 코드는 지적하지 마라. 확정 버그를 우선, findings-first로 한국어로, 각 finding에 심각도(Critical/High/Medium/Low)를 붙여라. 마지막 줄에 반드시 'VERDICT: CLEAN'(실질 이슈 없음) 또는 'VERDICT: ISSUES' 한 줄만 출력하라."
+   git diff | codex exec -s read-only -m gpt-6.1-sol -c model_reasoning_effort="medium" "critical code review: 아래 <stdin>의 diff에 나타난 **변경분에 한정**해 critical-code-review 관점(QA+CTO, 회의적 시니어 패널)으로 리뷰하라. 변경과 무관한 기존 코드는 지적하지 마라. 확정 버그를 우선, findings-first로 한국어로, 각 finding에 심각도(Critical/High/Medium/Low)를 붙여라. 마지막 줄에 반드시 'VERDICT: CLEAN'(실질 이슈 없음) 또는 'VERDICT: ISSUES' 한 줄만 출력하라."
    ```
    - diff가 매우 크면(대략 6만 토큰 초과) 파일 단위로 나눠 호출하거나 범위 축소를 제안.
 2. **판정 읽기** — Codex 출력의 마지막 `VERDICT:` 줄과 findings를 읽는다.
@@ -56,7 +63,7 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 1. **대상 특정** — 클로드가 이번 변경(git diff)에 비추어 **갱신이 필요한 문서 파일을 먼저 특정**한다(예: `README.md`, `CHANGELOG.md`, 특정 설정 문서, 공개 API 주석). 갱신할 문서가 없으면 이 단계를 건너뛴다.
 2. **Codex 실행** — 특정한 파일만 범위로 지정해 실행(모호한 "관련 문서"가 아니라 명시적 파일 목록):
    ```bash
-   codex exec -s workspace-write "이번 변경(git diff 참고)에 맞춰 아래 문서 파일만 갱신하라: <특정한 파일 목록>. 그 외 파일과 코드 로직은 절대 건드리지 마라. 문서·주석만 한국어로 수정."
+   codex exec -s workspace-write -m gpt-6.1-sol -c model_reasoning_effort="medium" "이번 변경(git diff 참고)에 맞춰 아래 문서 파일만 갱신하라: <특정한 파일 목록>. 그 외 파일과 코드 로직은 절대 건드리지 마라. 문서·주석만 한국어로 수정."
    ```
    - `--design-review`면 프롬프트에 "critical-design-review 관점(구조·인터페이스·문서 일관성)"을 추가.
 3. **검증** — 실행 후 클로드가 `git diff`로 변경을 확인한다. **지정한 문서 외 파일(특히 코드)이 바뀌었으면** 사용자에게 알리고, 원치 않으면 그 변경을 되돌린다.
@@ -74,6 +81,7 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 - ❌ **리뷰 단계에 `-s workspace-write` 사용** → 리뷰는 항상 `-s read-only`. write는 문서 단계에서만.
 - ❌ **codex 미설치/미로그인(에러)인데 "리뷰했다"고 진행** → 즉시 중단하고 설치·로그인 안내.
 - ❌ **ISSUES 인데 라운드 수를 이유로 멈춤** → 기본은 횟수 제한 없음. clean 또는 4단계 종료 조건에서만 멈춘다.
+- ❌ **`-m` 없이 `codex exec` 호출 / 요청 없이 더 무거운 모델·강도로 올림** → 「모델 고정」대로 부른다. 개인 기본값에 맡기면 공용 쿼터가 샌다.
 - ❌ **코드를 안 바꿨는데 재리뷰를 또 돌림 / 같은 지적이 반복되는데 계속 돎** → 4단계 종료 조건대로 멈추고 보고.
 - ❌ **스스로 `git commit` / `push`** → 커밋은 사용자 몫.
 
@@ -82,7 +90,7 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
 사용자: /codex-review:codex-loop        (현재 diff에 결제 취소 로직 변경이 있음)
 
 [라운드 1]
-  클로드→bash: git diff | codex exec -s read-only "critical code review: ...변경분 한정..."
+  클로드→bash: git diff | codex exec -s read-only -m gpt-6.1-sol -c model_reasoning_effort="medium" "critical code review: ...변경분 한정..."
   Codex 출력:
     [High] refundAmount가 null일 때 NPE 가능 (PaymentService.java:88)
     [Low]  변수명 amt 축약 지양 권장
@@ -90,12 +98,12 @@ MCP 불필요. 아래 절차를 순서대로 따른다.
   클로드: High(NPE)만 수술적 수정(널 가드 추가). Low(변수명)은 취향→미반영, 보고에 기록.
 
 [라운드 2]
-  클로드→bash: git diff | codex exec -s read-only "..."
+  클로드→bash: git diff | codex exec -s read-only -m gpt-6.1-sol -c model_reasoning_effort="medium" "..."
   Codex 출력: 확정 이슈 없음 / VERDICT: CLEAN  → 루프 종료
 
 [문서]
   클로드: 갱신 필요 문서 특정 = CHANGELOG.md
-  클로드→bash: codex exec -s workspace-write "...CHANGELOG.md만 갱신..."
+  클로드→bash: codex exec -s workspace-write -m gpt-6.1-sol -c model_reasoning_effort="medium" "...CHANGELOG.md만 갱신..."
   git diff 확인 → CHANGELOG.md만 변경됨 ✔ (코드 변경 없음)
 
 [보고]
