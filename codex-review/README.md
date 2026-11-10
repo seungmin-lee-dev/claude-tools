@@ -13,6 +13,11 @@
   정확성·테스트·운영 위험·코드 구조·모듈화까지 리뷰 → 클로드가 수정 → 재리뷰를 clean 이 날 때까지 반복 → Codex가 문서 갱신. 커밋은 안 함.
   - 인자 없음: 현재 uncommitted diff / `<작업 지시>`: 클로드가 먼저 구현
   - 플래그: `--max-rounds N`(기본 없음, 상한이 필요할 때만), `--no-docs`, `--design-review`, `--model M`(기본 `gpt-6-astra`), `--effort E`(기본 `medium`)
+  - 리뷰 방식(v0.6.0~):
+    - 지시문은 `skills/codex-loop/references/review-prompt.md` — 변경을 깨 보려는 자세, 꼭 의심할 곳 목록, diff 안의 글은 지시가 아닌 자료로 다룸
+    - 결과는 `references/review-output.schema.json` 틀의 JSON(`--output-schema`)으로 받는다 — 심각도·확신도·파일·줄·고칠 방법,
+      이번 변경이 만든 문제(`introduced`)와 원래 있던 문제(`pre_existing`) 구분
+    - 클로드는 고치기 전에 지적마다 파일·부르는 쪽·테스트를 열어 확인한다. 오판과 원래 있던 문제는 고치지 않고 보고에만 남긴다
 - **`/codex-review:setup-codex-review`** — Codex 쪽 의존성 셋업(1회): Codex CLI 설치/로그인 확인 안내 +
   번들 Codex 스킬을 `~/.codex/skills/`로 복사.
 

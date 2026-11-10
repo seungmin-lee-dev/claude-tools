@@ -1,0 +1,73 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "summary", "findings"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["clean", "issues"],
+      "description": "issues: origin=introduced 이고 머지를 막을 만한 지적이 하나라도 있을 때. 그 밖에는 clean."
+    },
+    "summary": {
+      "type": "string",
+      "description": "한두 문장 한국어 요약."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "severity",
+          "origin",
+          "title",
+          "body",
+          "file",
+          "line_start",
+          "line_end",
+          "confidence",
+          "recommendation"
+        ],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"]
+          },
+          "origin": {
+            "type": "string",
+            "enum": ["introduced", "pre_existing"],
+            "description": "introduced: 이 diff 가 만들거나 악화시킨 문제. pre_existing: 건드린 줄 근처에 원래 있던 문제."
+          },
+          "title": {
+            "type": "string",
+            "description": "한 줄 요약."
+          },
+          "body": {
+            "type": "string",
+            "description": "무엇이 잘못되나 / 어떤 입력·상태에서 깨지나 / 영향. diff 밖 추정은 '추정:' 으로 밝힌다."
+          },
+          "file": {
+            "type": "string",
+            "description": "diff 에 나온 경로 그대로."
+          },
+          "line_start": {
+            "type": "integer",
+            "description": "바뀐 뒤 파일 기준 시작 줄."
+          },
+          "line_end": {
+            "type": "integer",
+            "description": "바뀐 뒤 파일 기준 끝 줄."
+          },
+          "confidence": {
+            "type": "number",
+            "description": "실제 버그일 확률 0~1."
+          },
+          "recommendation": {
+            "type": "string",
+            "description": "구체적인 고칠 방법."
+          }
+        }
+      }
+    }
+  }
+}
