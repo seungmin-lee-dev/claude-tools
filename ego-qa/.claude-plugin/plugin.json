@@ -1,7 +1,7 @@
 {
   "name": "ego-qa",
   "description": "ego-browser(ego lite)로 로컬 웹 앱을 직접 눌러 보며 QA. 내 작업 확인·남의 PR 실제 동작 시험·버그 재현·전후 캡처·콘솔 오류/실패 요청 수집.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "MindOn"
   },
