@@ -27,7 +27,7 @@
       "name": "ego-qa",
       "source": "./ego-qa",
       "description": "ego-browser 로 로컬 웹 앱 QA·PR 실제 동작 시험·전후 캡처 (ego-qa)",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "seungmin-lee-dev"
       }
