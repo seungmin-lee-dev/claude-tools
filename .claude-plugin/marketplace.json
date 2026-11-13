@@ -1,6 +1,6 @@
 {
   "name": "claude-tools",
-  "description": "팀 내부 Claude Code 도구 모음 (플러그인 마켓플레이스)",
+  "description": "Claude Code 일반 스킬 모음 (플러그인 마켓플레이스). 회사 전용 스킬은 별도 비공개 저장소에서 관리",
   "owner": {
     "name": "seungmin-lee-dev"
   },
@@ -19,6 +19,15 @@
       "source": "./critical-review",
       "description": "Claude 단독 비판적 코드 리뷰 (critical-code-review). 외부 CLI 불필요",
       "version": "0.2.0",
+      "author": {
+        "name": "seungmin-lee-dev"
+      }
+    },
+    {
+      "name": "ego-qa",
+      "source": "./ego-qa",
+      "description": "ego-browser 로 로컬 웹 앱 QA·PR 실제 동작 시험·전후 캡처 (ego-qa)",
+      "version": "0.1.0",
       "author": {
         "name": "seungmin-lee-dev"
       }
